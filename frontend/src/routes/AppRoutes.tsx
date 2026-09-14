@@ -13,6 +13,7 @@ import SupportDashboardPage from '../features/support/pages/SupportDashboardPage
 import CommentManagerPage from '../features/comment/pages/CommentManagerPage';
 import CategoryManagerPage from '../features/category/pages/CategoryManagerPage';
 import FavouriteManagerPage from '../features/favourite/pages/FavouriteManagerPage';
+import PlaylistManagerPage from '../features/playlist/pages/PlaylistManagerPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -49,6 +50,11 @@ export const AppRoutes: React.FC = () => {
         {/* Protected Favourite Manager Routes */}
         <Route element={<ProtectedRoute requiredRole="ROLE_FAVOURITE_MANAGER" />}>
           <Route path="/favourites/manage" element={<FavouriteManagerPage />} />
+        </Route>
+
+        {/* Protected Playlist Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_PLAYLIST_MANAGER" />}>
+          <Route path="/playlists/manage" element={<PlaylistManagerPage />} />
         </Route>
 
         {/* Fallback */}
