@@ -36,4 +36,8 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
     long sumLikesByCreatorId(@Param("creatorId") Long creatorId);
 
     List<Video> findTop5ByCreatorIdOrderByViewsCountDesc(Long creatorId);
+
+    List<Video> findByCategoryId(Long categoryId);
+
+    long countByCategoryId(Long categoryId);
 }
