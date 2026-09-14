@@ -9,6 +9,7 @@ import { VideoAnalyticsPage } from '../features/video/pages/VideoAnalyticsPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import SupportDashboardPage from '../features/support/pages/SupportDashboardPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -25,6 +26,11 @@ export const AppRoutes: React.FC = () => {
           <Route path="/studio" element={<CreatorDashboardPage />} />
           <Route path="/studio/content" element={<VideoLibraryPage />} />
           <Route path="/studio/analytics" element={<VideoAnalyticsPage />} />
+        </Route>
+
+        {/* Protected Technical Supporter Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_TECHNICAL_SUPPORTER" />}>
+          <Route path="/support" element={<SupportDashboardPage />} />
         </Route>
 
         {/* Fallback */}
