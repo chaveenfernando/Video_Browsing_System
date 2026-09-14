@@ -1,16 +1,30 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
-  const links = [
+  const creatorLinks = [
     { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
     { to: '/studio/analytics', label: 'Analytics', icon: BarChart3, end: false },
   ];
+
+  const supportLinks = [
+    { to: '/support', label: 'Support Desk', icon: Headset, end: true },
+  ];
+
+  const commentLinks = [
+    { to: '/comments/manage', label: 'Manage Comments', icon: MessageSquare, end: true },
+  ];
+
+  const isSupporter = user?.role === 'ROLE_TECHNICAL_SUPPORTER' || user?.role === 'TECHNICAL_SUPPORTER';
+  const isCommentManager = user?.role === 'ROLE_COMMENT_MANAGER' || user?.role === 'COMMENT_MANAGER';
+
+  const activeLinks = isSupporter ? supportLinks : isCommentManager ? commentLinks : creatorLinks;
+  const menuLabel = isSupporter ? 'Support Menu' : isCommentManager ? 'Comment Menu' : 'Studio Menu';
 
   return (
     <aside className="w-64 border-r border-slate-800/80 bg-slate-950/40 p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-4rem)]">
@@ -30,8 +44,8 @@ export const Sidebar: React.FC = () => {
 
         {/* Navigation Items */}
         <div className="space-y-1">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Studio Menu</p>
-          {links.map((link) => {
+          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{menuLabel}</p>
+          {activeLinks.map((link) => {
             const Icon = link.icon;
             return (
               <NavLink

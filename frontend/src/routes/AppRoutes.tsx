@@ -9,6 +9,8 @@ import { VideoAnalyticsPage } from '../features/video/pages/VideoAnalyticsPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import SupportDashboardPage from '../features/support/pages/SupportDashboardPage';
+import CommentManagerPage from '../features/comment/pages/CommentManagerPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -19,6 +21,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="/watch/:id" element={<VideoWatchPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* Protected Technical Supporter Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_TECHNICAL_SUPPORTER" />}>
+          <Route path="/support" element={<SupportDashboardPage />} />
+        </Route>
+
+        {/* Protected Comment Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_COMMENT_MANAGER" />}>
+          <Route path="/comments/manage" element={<CommentManagerPage />} />
+        </Route>
 
         {/* Protected Content Creator Studio Routes */}
         <Route element={<ProtectedRoute requiredRole="ROLE_CONTENT_CREATOR" />}>
