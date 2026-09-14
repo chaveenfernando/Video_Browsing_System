@@ -31,4 +31,9 @@ public class TicketSubject {
             observer.onStatusChanged(ticketId, oldStatus, newStatus, recipientEmail);
         }
     }
+
+    /** Convenience overload when email is not required (in-app only). */
+    public void notifyObservers(Long ticketId, String oldStatus, String newStatus) {
+        notifyObservers(ticketId, oldStatus, newStatus, "");
+    }
 }
