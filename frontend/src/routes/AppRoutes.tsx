@@ -9,6 +9,7 @@ import { VideoAnalyticsPage } from '../features/video/pages/VideoAnalyticsPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import CategoryManagerPage from '../features/category/pages/CategoryManagerPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -25,6 +26,11 @@ export const AppRoutes: React.FC = () => {
           <Route path="/studio" element={<CreatorDashboardPage />} />
           <Route path="/studio/content" element={<VideoLibraryPage />} />
           <Route path="/studio/analytics" element={<VideoAnalyticsPage />} />
+        </Route>
+
+        {/* Protected Category Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_CATEGORY_MANAGER" />}>
+          <Route path="/categories/manage" element={<CategoryManagerPage />} />
         </Route>
 
         {/* Fallback */}
