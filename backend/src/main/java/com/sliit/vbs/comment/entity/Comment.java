@@ -6,10 +6,16 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Entity scaffold for Comment Manager team member role.
+ * Comment entity for the Comment Manager module.
+ * Supports pinning, hiding, editing, and like counts on video comments.
+ *
+ * @author IT25101638
  */
 @Entity
-@Table(name = "comments")
+@Table(name = "comments", indexes = {
+    @Index(name = "idx_comment_video", columnList = "video_id"),
+    @Index(name = "idx_comment_user", columnList = "user_id")
+})
 public class Comment {
 
     @Id
@@ -19,11 +25,17 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_pinned")
+    @Column(name = "is_pinned", nullable = false)
     private Boolean isPinned = false;
 
-    @Column(name = "is_hidden")
+    @Column(name = "is_hidden", nullable = false)
     private Boolean isHidden = false;
+
+    @Column(name = "is_edited", nullable = false)
+    private Boolean isEdited = false;
+
+    @Column(name = "like_count", nullable = false)
+    private Integer likeCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -34,10 +46,21 @@ public class Comment {
     private Video video;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     public Comment() {}
 
@@ -49,6 +72,10 @@ public class Comment {
     public void setIsPinned(Boolean isPinned) { this.isPinned = isPinned; }
     public Boolean getIsHidden() { return isHidden; }
     public void setIsHidden(Boolean isHidden) { this.isHidden = isHidden; }
+    public Boolean getIsEdited() { return isEdited; }
+    public void setIsEdited(Boolean isEdited) { this.isEdited = isEdited; }
+    public Integer getLikeCount() { return likeCount; }
+    public void setLikeCount(Integer likeCount) { this.likeCount = likeCount; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     public Video getVideo() { return video; }
