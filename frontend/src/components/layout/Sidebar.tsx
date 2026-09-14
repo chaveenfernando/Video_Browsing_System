@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag } from 'lucide-react';
+import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
@@ -14,6 +14,8 @@ export const Sidebar: React.FC = () => {
     ? [{ to: '/comments/manage', label: 'Manage Comments', icon: MessageSquare, end: true }]
     : role.includes('CATEGORY_MANAGER')
     ? [{ to: '/categories/manage', label: 'Manage Categories', icon: Tag, end: true }]
+    : role.includes('FAVOURITE_MANAGER')
+    ? [{ to: '/favourites/manage', label: 'Manage Favourites', icon: Heart, end: true }]
     : [
         { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
         { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
@@ -23,6 +25,7 @@ export const Sidebar: React.FC = () => {
   const menuLabel = role.includes('TECHNICAL_SUPPORTER') ? 'Support Menu'
     : role.includes('COMMENT_MANAGER') ? 'Comment Menu'
     : role.includes('CATEGORY_MANAGER') ? 'Category Menu'
+    : role.includes('FAVOURITE_MANAGER') ? 'Favourite Menu'
     : 'Studio Menu';
 
   return (

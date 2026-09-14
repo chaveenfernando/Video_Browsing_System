@@ -12,6 +12,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import SupportDashboardPage from '../features/support/pages/SupportDashboardPage';
 import CommentManagerPage from '../features/comment/pages/CommentManagerPage';
 import CategoryManagerPage from '../features/category/pages/CategoryManagerPage';
+import FavouriteManagerPage from '../features/favourite/pages/FavouriteManagerPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -43,6 +44,11 @@ export const AppRoutes: React.FC = () => {
         {/* Protected Category Manager Routes */}
         <Route element={<ProtectedRoute requiredRole="ROLE_CATEGORY_MANAGER" />}>
           <Route path="/categories/manage" element={<CategoryManagerPage />} />
+        </Route>
+
+        {/* Protected Favourite Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_FAVOURITE_MANAGER" />}>
+          <Route path="/favourites/manage" element={<FavouriteManagerPage />} />
         </Route>
 
         {/* Fallback */}
