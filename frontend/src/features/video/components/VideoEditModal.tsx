@@ -39,8 +39,14 @@ export const VideoEditModal: React.FC<VideoEditModalProps> = ({
       setCategoryId(video.categoryId);
       setTags(video.tags || '');
       setStatus(video.status);
+      setErrors({});
 
-      videoApi.getCategories().then(setCategories).catch(console.error);
+      videoApi.getCategories().then((cats) => {
+        setCategories(cats);
+        if (!video.categoryId && cats.length > 0) {
+          setCategoryId(cats[0].id);
+        }
+      }).catch(console.error);
     }
   }, [isOpen, video]);
 
@@ -50,6 +56,7 @@ export const VideoEditModal: React.FC<VideoEditModalProps> = ({
     const errs: Record<string, string> = {};
     if (!title.trim()) errs.title = 'Title is required';
     if (title.length > 150) errs.title = 'Title cannot exceed 150 characters';
+    if (!categoryId) errs.categoryId = 'Please select a category';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -59,6 +66,7 @@ export const VideoEditModal: React.FC<VideoEditModalProps> = ({
     if (!validate()) return;
 
     setIsLoading(true);
+    setErrors({});
     try {
       const payload: VideoUpdatePayload = {
         title: title.trim(),
@@ -71,9 +79,19 @@ export const VideoEditModal: React.FC<VideoEditModalProps> = ({
       };
 
       await videoApi.updateVideo(video.id, payload);
+
+      // Dispatch global event for live sync
+      window.dispatchEvent(new CustomEvent('video-uploaded'));
+
       onSuccess();
     } catch (err: any) {
-      setErrors({ form: err.response?.data?.message || 'Failed to update video.' });
+      const fieldErrors = err.response?.data?.data;
+      if (fieldErrors && typeof fieldErrors === 'object' && Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+      } else {
+        const msg = err.response?.data?.message || err.message || 'Failed to update video.';
+        setErrors({ form: msg });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -116,19 +134,31 @@ export const VideoEditModal: React.FC<VideoEditModalProps> = ({
           />
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Category
+              Category *
             </label>
             <select
-              value={categoryId || ''}
-              onChange={(e) => setCategoryId(Number(e.target.value))}
-              className="w-full px-3 py-2.5 bg-slate-900/80 border border-slate-700/80 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg text-slate-200 text-sm focus:outline-none"
+              value={categoryId ?? ''}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setCategoryId(isNaN(val) ? undefined : val);
+                if (errors.categoryId) {
+                  setErrors((prev) => ({ ...prev, categoryId: '' }));
+                }
+              }}
+              className={`w-full px-3 py-2.5 bg-slate-900/80 border rounded-lg text-slate-200 text-sm focus:outline-none ${
+                errors.categoryId ? 'border-rose-500 focus:border-rose-500' : 'border-slate-700/80 focus:border-indigo-500'
+              }`}
             >
+              <option value="" disabled>-- Select Category --</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
+            {errors.categoryId && (
+              <p className="text-rose-400 text-xs mt-1">{errors.categoryId}</p>
+            )}
           </div>
         </div>
 

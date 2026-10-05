@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../../components/ui/Modal';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { videoApi } from '../../../api/videoApi';
 import { Category, VideoCreatePayload, VideoStatus } from '../../../types';
-import { Film, Image, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface VideoUploadModalProps {
   isOpen: boolean;
@@ -30,18 +30,44 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const cats = await videoApi.getCategories();
+      if (cats && cats.length > 0) {
+        setCategories(cats);
+        setCategoryId((prev) => prev || cats[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to load categories', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
   useEffect(() => {
     if (isOpen) {
-      videoApi.getCategories().then((cats) => {
-        setCategories(cats);
-        if (cats.length > 0 && !categoryId) {
-          setCategoryId(cats[0].id);
-        }
-      }).catch(console.error);
+      fetchCategories();
+      setErrors({});
     }
-  }, [isOpen]);
+  }, [isOpen, fetchCategories]);
+
+  // Auto-detect YouTube links and extract thumbnail
+  const handleVideoUrlChange = (url: string) => {
+    setVideoUrl(url);
+    if (!thumbnailUrl) {
+      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+      if (ytMatch && ytMatch[1]) {
+        setThumbnailUrl(`https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`);
+      }
+    }
+  };
 
   const handleApplySample = (type: 'bunny' | 'tech') => {
+    const defaultCatId = categories.length > 0 ? categories[0].id : 1;
+    setCategoryId(defaultCatId);
+
     if (type === 'bunny') {
       setTitle('Next-Gen Microservices with Spring Boot 3 & Docker');
       setDescription('An in-depth architectural guide for university software engineering students demonstrating reactive streams and containerization.');
@@ -64,6 +90,7 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
     if (!title.trim()) errs.title = 'Title is required';
     if (title.length > 150) errs.title = 'Title cannot exceed 150 characters';
     if (!videoUrl.trim()) errs.videoUrl = 'Video URL or stream source is required';
+    if (!categoryId) errs.categoryId = 'Please select a category';
     if (durationSeconds <= 0) errs.duration = 'Duration must be greater than 0';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -74,19 +101,25 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
     if (!validate()) return;
 
     setIsLoading(true);
+    setErrors({});
     try {
+      const selectedCat = categoryId || (categories.length > 0 ? categories[0].id : 1);
       const payload: VideoCreatePayload = {
         title: title.trim(),
         description: description.trim(),
         videoUrl: videoUrl.trim(),
         thumbnailUrl: thumbnailUrl.trim() || undefined,
         durationSeconds: Number(durationSeconds),
-        categoryId: categoryId ? Number(categoryId) : undefined,
+        categoryId: Number(selectedCat),
         tags: tags.trim() || undefined,
         status,
       };
 
       await videoApi.createVideo(payload);
+
+      // Dispatch global event so BrowseVideosPage and CreatorDashboardPage refresh automatically
+      window.dispatchEvent(new CustomEvent('video-uploaded'));
+
       // Reset form
       setTitle('');
       setDescription('');
@@ -97,7 +130,18 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
       setErrors({});
       onSuccess();
     } catch (err: any) {
-      setErrors({ form: err.response?.data?.message || 'Failed to upload video.' });
+      const status = err.response?.status;
+      if (status === 403 || status === 401) {
+        setErrors({ form: '🔐 Session expired or insufficient permissions. Please log out and log back in as a Content Creator.' });
+      } else {
+        const fieldErrors = err.response?.data?.data;
+        if (fieldErrors && typeof fieldErrors === 'object' && Object.keys(fieldErrors).length > 0) {
+          setErrors(fieldErrors);
+        } else {
+          const msg = err.response?.data?.message || err.message || 'Failed to upload video.';
+          setErrors({ form: msg });
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -163,10 +207,10 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
         {/* Video URL & Thumbnail URL Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Video Stream / MP4 URL *"
-            placeholder="https://.../video.mp4"
+            label="Video Stream / MP4 / YouTube URL *"
+            placeholder="https://.../video.mp4 or YouTube link"
             value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
+            onChange={(e) => handleVideoUrlChange(e.target.value)}
             error={errors.videoUrl}
           />
           <Input
@@ -181,19 +225,31 @@ export const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Category
+              Category *
             </label>
             <select
-              value={categoryId || ''}
-              onChange={(e) => setCategoryId(Number(e.target.value))}
-              className="w-full px-3 py-2.5 bg-slate-900/80 border border-slate-700/80 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg text-slate-200 text-sm focus:outline-none"
+              value={categoryId ?? ''}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setCategoryId(isNaN(val) ? undefined : val);
+                if (errors.categoryId) {
+                  setErrors((prev) => ({ ...prev, categoryId: '' }));
+                }
+              }}
+              className={`w-full px-3 py-2.5 bg-slate-900/80 border rounded-lg text-slate-200 text-sm focus:outline-none ${
+                errors.categoryId ? 'border-rose-500 focus:border-rose-500' : 'border-slate-700/80 focus:border-indigo-500'
+              }`}
             >
+              <option value="" disabled>-- Select Category --</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
+            {errors.categoryId && (
+              <p className="text-rose-400 text-xs mt-1">{errors.categoryId}</p>
+            )}
           </div>
 
           <Input

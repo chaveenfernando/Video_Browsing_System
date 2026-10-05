@@ -9,6 +9,15 @@ import { VideoAnalyticsPage } from '../features/video/pages/VideoAnalyticsPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { ProtectedRoute } from './ProtectedRoute';
+<<<<<<< Updated upstream
+=======
+import SupportDashboardPage from '../features/support/pages/SupportDashboardPage';
+import CommentManagerPage from '../features/comment/pages/CommentManagerPage';
+import CategoryManagerPage from '../features/category/pages/CategoryManagerPage';
+import FavouriteManagerPage from '../features/favourite/pages/FavouriteManagerPage';
+import PlaylistManagerPage from '../features/playlist/pages/PlaylistManagerPage';
+import ViewerLibraryPage from '../features/viewer/pages/ViewerLibraryPage';
+>>>>>>> Stashed changes
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -27,6 +36,40 @@ export const AppRoutes: React.FC = () => {
           <Route path="/studio/analytics" element={<VideoAnalyticsPage />} />
         </Route>
 
+<<<<<<< Updated upstream
+=======
+        {/* Protected Technical Supporter Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_TECHNICAL_SUPPORTER" />}>
+          <Route path="/support" element={<SupportDashboardPage />} />
+        </Route>
+
+        {/* Protected Comment Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_COMMENT_MANAGER" />}>
+          <Route path="/comments/manage" element={<CommentManagerPage />} />
+        </Route>
+
+        {/* Protected Category Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_CATEGORY_MANAGER" />}>
+          <Route path="/categories/manage" element={<CategoryManagerPage />} />
+        </Route>
+
+        {/* Protected Favourite Routes (Manager Analytics for Favourite Manager, Saved Collection for Viewers/Creators) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/favourites/manage" element={<FavouriteManagerPage />} />
+          <Route path="/favourites" element={<FavouriteManagerPage />} />
+        </Route>
+
+        {/* Viewer Library — combined saved videos + playlists (all authenticated users) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/library" element={<ViewerLibraryPage />} />
+        </Route>
+
+        {/* Protected Playlist Manager Routes */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_PLAYLIST_MANAGER" />}>
+          <Route path="/playlists/manage" element={<PlaylistManagerPage />} />
+        </Route>
+
+>>>>>>> Stashed changes
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

@@ -21,6 +21,7 @@ backend/uploads/*
 
 # IDE & OS Metadata
 .idea/
+.run/
 .vscode/
 *.iml
 *.iws

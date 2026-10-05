@@ -43,9 +43,10 @@ export const CreatorDashboardPage: React.FC = () => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       try {
         await videoApi.deleteVideo(id);
+        window.dispatchEvent(new CustomEvent('video-uploaded'));
         loadData();
-      } catch (err) {
-        alert('Failed to delete video.');
+      } catch (err: any) {
+        alert(err.response?.data?.message || err.message || 'Failed to delete video.');
       }
     }
   };

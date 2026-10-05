@@ -121,6 +121,18 @@ public class VideoController {
             return ResponseEntity.badRequest().body(ApiResponse.error("File cannot be empty"));
         }
 
+        // Validate format: MP4, MOV, AVI (TC-UV-03, TC-UV-04)
+        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename().toLowerCase() : "";
+        if (!originalFilename.endsWith(".mp4") && !originalFilename.endsWith(".mov") && !originalFilename.endsWith(".avi")) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Unsupported file format. Use MP4, MOV or AVI"));
+        }
+
+        // Validate size limit (2 GB = 2147483648 bytes) (TC-UV-05)
+        long maxSizeBytes = 2L * 1024 * 1024 * 1024; // 2 GB
+        if (file.getSize() > maxSizeBytes) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("File size exceeds the allowed limit"));
+        }
+
         String uploadDir = "uploads/";
         File dir = new File(uploadDir);
         if (!dir.exists()) {

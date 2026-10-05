@@ -1,16 +1,52 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+<<<<<<< Updated upstream
 import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles } from 'lucide-react';
+=======
+import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag, Heart, ListVideo, BookMarked } from 'lucide-react';
+>>>>>>> Stashed changes
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
+<<<<<<< Updated upstream
   const links = [
     { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
     { to: '/studio/analytics', label: 'Analytics', icon: BarChart3, end: false },
   ];
+=======
+  const role = user?.role ?? '';
+
+  const navLinks = role.includes('TECHNICAL_SUPPORTER')
+    ? [{ to: '/support', label: 'Support Desk', icon: Headset, end: true }]
+    : role.includes('COMMENT_MANAGER')
+    ? [{ to: '/comments/manage', label: 'Manage Comments', icon: MessageSquare, end: true }]
+    : role.includes('CATEGORY_MANAGER')
+    ? [{ to: '/categories/manage', label: 'Manage Categories', icon: Tag, end: true }]
+    : role.includes('FAVOURITE_MANAGER')
+    ? [{ to: '/favourites/manage', label: 'Manage Favourites', icon: Heart, end: true }]
+    : role.includes('PLAYLIST_MANAGER')
+    ? [{ to: '/playlists/manage', label: 'Manage Playlists', icon: ListVideo, end: true }]
+    : role.includes('GENERAL_VIEWER')
+    ? [
+        { to: '/library', label: 'My Library', icon: BookMarked, end: false },
+      ]
+    : [
+        { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
+        { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
+        { to: '/studio/analytics', label: 'Analytics', icon: BarChart3, end: false },
+      ];
+
+  const menuLabel = role.includes('TECHNICAL_SUPPORTER') ? 'Support Menu'
+    : role.includes('COMMENT_MANAGER') ? 'Comment Menu'
+    : role.includes('CATEGORY_MANAGER') ? 'Category Menu'
+    : role.includes('FAVOURITE_MANAGER') ? 'Favourite Menu'
+    : role.includes('PLAYLIST_MANAGER') ? 'Playlist Menu'
+    : role.includes('GENERAL_VIEWER') ? 'Viewer Menu'
+    : 'Studio Menu';
+>>>>>>> Stashed changes
 
   return (
     <aside className="w-64 border-r border-slate-800/80 bg-slate-950/40 p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-4rem)]">
@@ -64,6 +100,7 @@ export const Sidebar: React.FC = () => {
           </NavLink>
         </div>
       </div>
+<<<<<<< Updated upstream
 
       {/* Project Meta Info */}
       <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
@@ -79,6 +116,8 @@ export const Sidebar: React.FC = () => {
           Role: Content Creator
         </div>
       </div>
+=======
+>>>>>>> Stashed changes
     </aside>
   );
 };

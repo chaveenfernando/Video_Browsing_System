@@ -19,16 +19,24 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle Token Expiration (401)
+// Response Interceptor: Handle Token Expiration (401) and Access Denied (403)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and user on unauthorized
+      // Clear stale token and redirect to login
       localStorage.removeItem('vbs_token');
       localStorage.removeItem('vbs_user');
-      if (window.location.pathname.startsWith('/studio')) {
-        window.location.href = '/login';
+      window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      // Token exists but user has no permission — session may be stale after server restart
+      const token = localStorage.getItem('vbs_token');
+      if (token) {
+        // Provide a clearer error message by enriching the error object
+        const msg = 'Session expired or insufficient permissions. Please log out and log in again.';
+        if (error.response?.data) {
+          error.response.data.message = msg;
+        }
       }
     }
     return Promise.reject(error);

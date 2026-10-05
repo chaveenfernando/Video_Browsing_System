@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PlaySquare, LogIn, Sparkles } from 'lucide-react';
+import { PlaySquare, LogIn } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -30,19 +30,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickFill = (userType: 'creator' | 'category' | 'playlist') => {
-    if (userType === 'creator') {
-      setUsernameOrEmail('creator@sliit.lk');
-      setPassword('password123');
-    } else if (userType === 'category') {
-      setUsernameOrEmail('category@sliit.lk');
-      setPassword('password123');
-    } else {
-      setUsernameOrEmail('playlist@sliit.lk');
-      setPassword('password123');
-    }
-  };
-
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 sm:p-8 bg-slate-900/90 border-slate-800 shadow-2xl space-y-6">
@@ -55,37 +42,6 @@ export const LoginPage: React.FC = () => {
           <p className="text-xs text-slate-400">
             Web-Based Video Browsing System (SE2030)
           </p>
-        </div>
-
-        {/* Demo Fast Login Helpers for Viva */}
-        <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/20 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-300">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span>Viva Quick Sign-In:</span>
-          </div>
-          <div className="grid grid-cols-3 gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleQuickFill('creator')}
-              className="px-2 py-1 rounded bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-[11px] font-medium border border-indigo-500/30 transition-colors truncate"
-            >
-              Creator
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickFill('category')}
-              className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium border border-slate-700 transition-colors truncate"
-            >
-              Category
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickFill('playlist')}
-              className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium border border-slate-700 transition-colors truncate"
-            >
-              Playlist
-            </button>
-          </div>
         </div>
 
         {error && (

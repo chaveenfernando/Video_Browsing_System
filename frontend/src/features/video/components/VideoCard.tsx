@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, ThumbsUp, Clock, Calendar } from 'lucide-react';
+import { Eye, ThumbsUp, Clock } from 'lucide-react';
 import { Video } from '../../../types';
 import { VideoStatusBadge } from '../../../components/ui/Badge';
 
@@ -10,11 +10,6 @@ interface VideoCardProps {
 }
 
 export const VideoCard: React.FC<VideoCardProps> = ({ video, showStatus = false }) => {
-  const formattedDate = new Date(video.createdAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
 
   return (
     <Link
