@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.context.event.EventListener;
+import com.sliit.vbs.video.event.VideoUploadedEvent;
+
 /**
  * ============================================================================
  * VIVA EXPLANATION: NotificationServiceImpl
@@ -20,6 +23,11 @@ import java.util.stream.Collectors;
  * comment, support, playlist).
  * Integrates with NotificationFactory (Design Pattern) to decouple the creation
  * of notification channels while maintaining persistent alerts in DB.
+ * 
+ * DESIGN PATTERN (OBSERVER):
+ * This service acts as an OBSERVER listening for VideoUploadedEvent. When a video
+ * is uploaded, it automatically generates a platform-wide notification without 
+ * coupling the video upload logic directly to the notification logic.
  * ============================================================================
  */
 @Service
@@ -33,6 +41,24 @@ public class NotificationServiceImpl implements NotificationService {
                                    NotificationFactory notificationFactory) {
         this.notificationRepository = notificationRepository;
         this.notificationFactory = notificationFactory;
+    }
+
+    // OBSERVER PATTERN: Listening to the event
+    @EventListener
+    public void handleVideoUploadedEvent(VideoUploadedEvent event) {
+        System.out.println("OBSERVER TRIGGERED: New Video Uploaded - " + event.getVideoTitle());
+        
+        // Notify subscribers (or in this case, broadcast a system alert for the new video)
+        sendNotification(
+                "SYSTEM_BROADCAST",
+                "ROLE_GENERAL_VIEWER",
+                event.getUploaderName(),
+                event.getUploaderName(),
+                "New Video from " + event.getUploaderName(),
+                "Check out the new video: " + event.getVideoTitle(),
+                "NEW_VIDEO_ALERT",
+                event.getVideoId()
+        );
     }
 
     @Override

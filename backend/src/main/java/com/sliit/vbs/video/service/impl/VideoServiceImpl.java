@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,8 @@ public class VideoServiceImpl implements VideoService {
     private final VideoSortContext videoSortContext;
     private final NotificationFactory notificationFactory;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private com.sliit.vbs.notification.service.NotificationService notificationService;
 
@@ -56,12 +59,14 @@ public class VideoServiceImpl implements VideoService {
                             CategoryRepository categoryRepository,
                             VideoMapper videoMapper,
                             VideoSortContext videoSortContext,
-                            NotificationFactory notificationFactory) {
+                            NotificationFactory notificationFactory,
+                            ApplicationEventPublisher eventPublisher) {
         this.videoRepository = videoRepository;
         this.categoryRepository = categoryRepository;
         this.videoMapper = videoMapper;
         this.videoSortContext = videoSortContext;
         this.notificationFactory = notificationFactory;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -95,6 +100,15 @@ public class VideoServiceImpl implements VideoService {
 
         Notification inAppNotification = notificationFactory.createNotification("IN_APP");
         inAppNotification.send(creator.getUsername(), "New video uploaded: " + savedVideo.getTitle());
+
+        // DESIGN PATTERN: Observer Pattern (Publishing the event)
+        eventPublisher.publishEvent(new com.sliit.vbs.video.event.VideoUploadedEvent(
+                this, 
+                savedVideo.getId(), 
+                savedVideo.getTitle(), 
+                creator.getId(), 
+                creator.getUsername()
+        ));
 
         return videoMapper.toResponse(savedVideo);
     }
