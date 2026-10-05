@@ -35,6 +35,9 @@ public class SupportTicketServiceImpl implements SupportTicketService {
     private final UserRepository userRepository;
     private final TicketSubject ticketSubject;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.sliit.vbs.notification.service.NotificationService notificationService;
+
     public SupportTicketServiceImpl(SupportTicketRepository ticketRepository,
                                     UserRepository userRepository,
                                     TicketSubject ticketSubject) {
@@ -56,6 +59,24 @@ public class SupportTicketServiceImpl implements SupportTicketService {
         ticket.setUser(user);
 
         SupportTicket saved = ticketRepository.save(ticket);
+
+        // STAKEHOLDER NOTIFICATION: Alert Technical Supporter
+        try {
+            if (notificationService != null) {
+                notificationService.sendNotification(
+                        null,
+                        "ROLE_TECHNICAL_SUPPORTER",
+                        user.getUsername(),
+                        user.getFullName(),
+                        "New Support Ticket #" + saved.getId(),
+                        user.getFullName() + " filed ticket: \"" + saved.getSubject() + "\" [" + saved.getPriority() + "]",
+                        "SUPPORT",
+                        saved.getId()
+                );
+            }
+        } catch (Exception ignored) {
+        }
+
         return toResponse(saved);
     }
 
@@ -120,7 +141,7 @@ public class SupportTicketServiceImpl implements SupportTicketService {
 
         // Only the ticket owner or a TECHNICAL_SUPPORTER can edit
         boolean isOwner = ticket.getUser().getId().equals(user.getId());
-        boolean isTechnicalSupporter = user.getRole() == Role.TECHNICAL_SUPPORTER;
+        boolean isTechnicalSupporter = user.getRole() == Role.ROLE_TECHNICAL_SUPPORTER;
         if (!isOwner && !isTechnicalSupporter) {
             throw new BadRequestException("You do not have permission to edit this ticket");
         }
@@ -142,7 +163,7 @@ public class SupportTicketServiceImpl implements SupportTicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
         boolean isOwner = ticket.getUser().getId().equals(user.getId());
-        boolean isTechnicalSupporter = user.getRole() == Role.TECHNICAL_SUPPORTER;
+        boolean isTechnicalSupporter = user.getRole() == Role.ROLE_TECHNICAL_SUPPORTER;
         if (!isOwner && !isTechnicalSupporter) {
             throw new BadRequestException("You do not have permission to delete this ticket");
         }

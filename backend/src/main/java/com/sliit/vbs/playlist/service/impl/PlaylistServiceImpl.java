@@ -2,6 +2,7 @@ package com.sliit.vbs.playlist.service.impl;
 
 import com.sliit.vbs.common.exception.BadRequestException;
 import com.sliit.vbs.common.exception.ResourceNotFoundException;
+import com.sliit.vbs.notification.service.NotificationService;
 import com.sliit.vbs.playlist.dto.PlaylistRequest;
 import com.sliit.vbs.playlist.dto.PlaylistResponse;
 import com.sliit.vbs.playlist.dto.PlaylistVideoResponse;
@@ -28,15 +29,18 @@ public class PlaylistServiceImpl implements PlaylistService {
     private final PlaylistVideoRepository playlistVideoRepository;
     private final UserRepository userRepository;
     private final VideoRepository videoRepository;
+    private final NotificationService notificationService;
 
     public PlaylistServiceImpl(PlaylistRepository playlistRepository,
                                PlaylistVideoRepository playlistVideoRepository,
                                UserRepository userRepository,
-                               VideoRepository videoRepository) {
+                               VideoRepository videoRepository,
+                               NotificationService notificationService) {
         this.playlistRepository = playlistRepository;
         this.playlistVideoRepository = playlistVideoRepository;
         this.userRepository = userRepository;
         this.videoRepository = videoRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -47,7 +51,23 @@ public class PlaylistServiceImpl implements PlaylistService {
         playlist.setDescription(request.getDescription());
         playlist.setIsPublic(request.getIsPublic() != null ? request.getIsPublic() : true);
         playlist.setUser(user);
-        return toResponse(playlistRepository.save(playlist));
+        Playlist saved = playlistRepository.save(playlist);
+
+        // Notify Playlist Manager if created by viewer or other role
+        if (user.getRole() == null || !user.getRole().name().equals("ROLE_PLAYLIST_MANAGER")) {
+            notificationService.sendNotification(
+                    null,
+                    "ROLE_PLAYLIST_MANAGER",
+                    user.getUsername(),
+                    user.getFullName() != null ? user.getFullName() : user.getUsername(),
+                    "New Viewer Playlist Created",
+                    user.getUsername() + " created a new playlist: \"" + saved.getTitle() + "\"",
+                    "PLAYLIST",
+                    saved.getId()
+            );
+        }
+
+        return toResponse(saved);
     }
 
     @Override
@@ -68,6 +88,13 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Transactional(readOnly = true)
     public List<PlaylistResponse> getPublicPlaylists() {
         return playlistRepository.findByIsPublicTrueOrderByCreatedAtDesc()
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlaylistResponse> getAllPlaylists() {
+        return playlistRepository.findAllByOrderByCreatedAtDesc()
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
@@ -105,7 +132,23 @@ public class PlaylistServiceImpl implements PlaylistService {
         pv.setVideo(video);
         pv.setDisplayOrder(nextOrder);
 
-        return toVideoResponse(playlistVideoRepository.save(pv));
+        PlaylistVideo savedPv = playlistVideoRepository.save(pv);
+
+        User user = findUser(username);
+        if (user.getRole() == null || !user.getRole().name().equals("ROLE_PLAYLIST_MANAGER")) {
+            notificationService.sendNotification(
+                    null,
+                    "ROLE_PLAYLIST_MANAGER",
+                    user.getUsername(),
+                    user.getFullName() != null ? user.getFullName() : user.getUsername(),
+                    "Video Added to Playlist",
+                    user.getUsername() + " added \"" + video.getTitle() + "\" to playlist \"" + playlist.getTitle() + "\"",
+                    "PLAYLIST",
+                    playlist.getId()
+            );
+        }
+
+        return toVideoResponse(savedPv);
     }
 
     @Override
@@ -137,7 +180,9 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     private Playlist findPlaylistAndVerifyOwner(Long id, String username) {
         Playlist playlist = findPlaylist(id);
-        if (!playlist.getUser().getUsername().equals(username)) {
+        User user = findUser(username);
+        boolean isPlaylistManager = user.getRole() != null && user.getRole().name().equals("ROLE_PLAYLIST_MANAGER");
+        if (!playlist.getUser().getUsername().equals(username) && !isPlaylistManager) {
             throw new BadRequestException("You do not own this playlist");
         }
         return playlist;
@@ -151,6 +196,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         r.setIsPublic(p.getIsPublic());
         r.setUserId(p.getUser().getId());
         r.setCreatorName(p.getUser().getUsername());
+        r.setCreatorRole(p.getUser().getRole() != null ? p.getUser().getRole().name() : null);
         r.setCreatedAt(p.getCreatedAt());
         r.setVideoCount((int) playlistVideoRepository.countByPlaylistId(p.getId()));
         return r;

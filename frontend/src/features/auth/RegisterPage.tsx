@@ -106,12 +106,13 @@ export const RegisterPage: React.FC = () => {
               onChange={(e) => setRole(e.target.value as Role)}
               className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 focus:border-indigo-500 rounded-lg text-slate-100 text-sm focus:outline-none"
             >
-              <option value="ROLE_CONTENT_CREATOR">1. Content Creator (Upload, Edit, Delete Videos & Analytics)</option>
-              <option value="ROLE_CATEGORY_MANAGER">2. Category Manager (Manage Categories & Tags)</option>
-              <option value="ROLE_PLAYLIST_MANAGER">3. Playlist Manager (Create & Order Playlists)</option>
-              <option value="ROLE_FAVOURITE_MANAGER">4. Favourite Manager (Manage Bookmarks)</option>
-              <option value="ROLE_COMMENT_MANAGER">5. Comment Manager (Moderate & Pin Comments)</option>
-              <option value="ROLE_TECHNICAL_SUPPORTER">6. Technical Supporter (Tickets & Bug Logging)</option>
+              <option value="ROLE_CONTENT_CREATOR">1. Content Creator</option>
+              <option value="ROLE_CATEGORY_MANAGER">2. Category Manager</option>
+              <option value="ROLE_PLAYLIST_MANAGER">3. Playlist Manager</option>
+              <option value="ROLE_FAVOURITE_MANAGER">4. Favourite Manager</option>
+              <option value="ROLE_COMMENT_MANAGER">5. Comment Manager</option>
+              <option value="ROLE_TECHNICAL_SUPPORTER">6. Technical Supporter</option>
+              <option value="ROLE_GENERAL_VIEWER">7. General Viewer</option>
             </select>
           </div>
 

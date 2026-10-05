@@ -3,14 +3,18 @@ import supportApi, { SupportTicket, DashboardStats } from '../../../api/supportA
 import TicketCard from '../components/TicketCard';
 import CreateTicketModal from '../components/CreateTicketModal';
 import UpdateStatusModal from '../components/UpdateStatusModal';
+import TicketDetailModal from '../components/TicketDetailModal';
+
+type FilterType = SupportTicket['status'] | 'ALL' | 'VIDEO';
 
 const SupportDashboardPage: React.FC = () => {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<SupportTicket['status'] | 'ALL'>('ALL');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [viewingTicket, setViewingTicket] = useState<SupportTicket | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
 
   const fetchData = async () => {
@@ -20,8 +24,14 @@ const SupportDashboardPage: React.FC = () => {
         supportApi.getAllTickets(),
         supportApi.getDashboardStats(),
       ]);
-      setTickets(ticketsRes.data.data ?? []);
+      const list = ticketsRes.data.data ?? [];
+      setTickets(list);
       setStats(statsRes.data.data ?? null);
+      // If currently viewing a ticket, refresh its state
+      if (viewingTicket) {
+        const updated = list.find(t => t.id === viewingTicket.id);
+        if (updated) setViewingTicket(updated);
+      }
     } catch {
       setTickets([]);
     } finally {
@@ -42,10 +52,17 @@ const SupportDashboardPage: React.FC = () => {
     setShowStatusModal(true);
   };
 
-  const filtered = activeFilter === 'ALL' ? tickets : tickets.filter(t => t.status === activeFilter);
+  const videoCount = tickets.filter(t => t.subject.startsWith('Video Issue:') || t.description.includes('Video ID:')).length;
 
-  const FILTERS: Array<{ label: string; value: SupportTicket['status'] | 'ALL'; count?: number }> = [
+  const filtered = activeFilter === 'ALL'
+    ? tickets
+    : activeFilter === 'VIDEO'
+    ? tickets.filter(t => t.subject.startsWith('Video Issue:') || t.description.includes('Video ID:'))
+    : tickets.filter(t => t.status === activeFilter);
+
+  const FILTERS: Array<{ label: string; value: FilterType; count?: number }> = [
     { label: 'All', value: 'ALL', count: stats?.total },
+    { label: '🎬 Video Reports', value: 'VIDEO', count: videoCount },
     { label: 'Open', value: 'OPEN', count: stats?.open },
     { label: 'In Progress', value: 'IN_PROGRESS', count: stats?.inProgress },
     { label: 'Resolved', value: 'RESOLVED', count: stats?.resolved },
@@ -124,6 +141,7 @@ const SupportDashboardPage: React.FC = () => {
             <TicketCard
               key={ticket.id}
               ticket={ticket}
+              onClick={() => setViewingTicket(ticket)}
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
             />
@@ -132,6 +150,14 @@ const SupportDashboardPage: React.FC = () => {
       )}
 
       {/* Modals */}
+      {viewingTicket && (
+        <TicketDetailModal
+          ticket={viewingTicket}
+          onClose={() => setViewingTicket(null)}
+          onUpdate={fetchData}
+          onDelete={handleDelete}
+        />
+      )}
       {showCreateModal && (
         <CreateTicketModal
           onClose={() => setShowCreateModal(false)}

@@ -1,11 +1,22 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag, Heart, ListVideo } from 'lucide-react';
+<<<<<<< Updated upstream
+import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles } from 'lucide-react';
+=======
+import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag, Heart, ListVideo, BookMarked } from 'lucide-react';
+>>>>>>> Stashed changes
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
+<<<<<<< Updated upstream
+  const links = [
+    { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
+    { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
+    { to: '/studio/analytics', label: 'Analytics', icon: BarChart3, end: false },
+  ];
+=======
   const role = user?.role ?? '';
 
   const navLinks = role.includes('TECHNICAL_SUPPORTER')
@@ -18,6 +29,10 @@ export const Sidebar: React.FC = () => {
     ? [{ to: '/favourites/manage', label: 'Manage Favourites', icon: Heart, end: true }]
     : role.includes('PLAYLIST_MANAGER')
     ? [{ to: '/playlists/manage', label: 'Manage Playlists', icon: ListVideo, end: true }]
+    : role.includes('GENERAL_VIEWER')
+    ? [
+        { to: '/library', label: 'My Library', icon: BookMarked, end: false },
+      ]
     : [
         { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
         { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
@@ -29,19 +44,21 @@ export const Sidebar: React.FC = () => {
     : role.includes('CATEGORY_MANAGER') ? 'Category Menu'
     : role.includes('FAVOURITE_MANAGER') ? 'Favourite Menu'
     : role.includes('PLAYLIST_MANAGER') ? 'Playlist Menu'
+    : role.includes('GENERAL_VIEWER') ? 'Viewer Menu'
     : 'Studio Menu';
+>>>>>>> Stashed changes
 
   return (
     <aside className="w-64 border-r border-slate-800/80 bg-slate-950/40 p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-4rem)]">
       <div className="space-y-6">
-        {/* Identity Banner */}
+        {/* Creator Identity Banner */}
         <div className="p-3.5 rounded-xl bg-gradient-to-br from-indigo-950/50 to-slate-900 border border-indigo-500/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-indigo-600/30 flex items-center justify-center text-indigo-400">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-indigo-300 uppercase tracking-wider">{menuLabel}</p>
+              <p className="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Creator Studio</p>
               <h4 className="text-sm font-bold text-white truncate max-w-[120px]">{user?.fullName}</h4>
             </div>
           </div>
@@ -49,8 +66,8 @@ export const Sidebar: React.FC = () => {
 
         {/* Navigation Items */}
         <div className="space-y-1">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{menuLabel}</p>
-          {navLinks.map((link) => {
+          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Studio Menu</p>
+          {links.map((link) => {
             const Icon = link.icon;
             return (
               <NavLink
@@ -83,6 +100,7 @@ export const Sidebar: React.FC = () => {
           </NavLink>
         </div>
       </div>
+<<<<<<< Updated upstream
 
       {/* Project Meta Info */}
       <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
@@ -94,8 +112,12 @@ export const Sidebar: React.FC = () => {
           <span>Group:</span>
           <span className="text-indigo-400 font-mono text-[10px]">B5G2-03</span>
         </div>
+        <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+          Role: Content Creator
+        </div>
       </div>
+=======
+>>>>>>> Stashed changes
     </aside>
   );
 };
-

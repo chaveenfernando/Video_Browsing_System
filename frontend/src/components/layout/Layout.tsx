@@ -7,7 +7,13 @@ import { VideoUploadModal } from '../../features/video/components/VideoUploadMod
 export const Layout: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const location = useLocation();
-  const isStudioRoute = location.pathname.startsWith('/studio');
+  const isStudioRoute = location.pathname.startsWith('/studio') ||
+                        location.pathname.startsWith('/support') ||
+                        location.pathname.startsWith('/comments') ||
+                        location.pathname.startsWith('/categories') ||
+                        location.pathname.startsWith('/favourites') ||
+                        location.pathname.startsWith('/playlists') ||
+                        location.pathname.startsWith('/library');
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0d14] text-slate-100">

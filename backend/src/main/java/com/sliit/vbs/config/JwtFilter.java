@@ -27,6 +27,11 @@ import java.io.IOException;
  * 4. Loads UserDetails from the database/service.
  * 5. Populates Spring Security's SecurityContextHolder with an authenticated token.
  * 6. Downstream controllers can then inspect @AuthenticationPrincipal User user.
+ *
+ * NOTE: If the token references a user that no longer exists in the database
+ * (e.g., H2 in-memory DB was restarted and an ad-hoc registered user is gone),
+ * we catch UsernameNotFoundException and continue without setting authentication,
+ * which causes the request to be treated as anonymous.
  * ============================================================================
  */
 @Component
@@ -58,19 +63,25 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.extractUsername(jwtToken);
         } catch (Exception e) {
-            // Invalid token - continue without setting authentication
+            // Invalid/expired/malformed token — continue without setting authentication
             filterChain.doFilter(request, response);
             return;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.loadUserByUsername(username);
+            try {
+                UserDetails userDetails = userService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(jwtToken, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtUtil.validateToken(jwtToken, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (Exception ex) {
+                // User referenced in token no longer exists (e.g., DB was wiped and user was not re-seeded).
+                // Clear any partial state and continue — the request will be treated as unauthenticated.
+                SecurityContextHolder.clearContext();
             }
         }
 

@@ -32,13 +32,16 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final VideoRepository videoRepository;
+    private final com.sliit.vbs.notification.service.NotificationService notificationService;
 
     public CommentServiceImpl(CommentRepository commentRepository,
                               UserRepository userRepository,
-                              VideoRepository videoRepository) {
+                              VideoRepository videoRepository,
+                              com.sliit.vbs.notification.service.NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.videoRepository = videoRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -52,7 +55,43 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(user);
         comment.setVideo(video);
 
-        return toResponse(commentRepository.save(comment));
+        Comment saved = commentRepository.save(comment);
+
+        // STAKEHOLDER NOTIFICATION:
+        // 1. Notify Comment Manager role
+        try {
+            String excerpt = request.getContent().length() > 60
+                    ? request.getContent().substring(0, 57) + "..."
+                    : request.getContent();
+
+            notificationService.sendNotification(
+                    null,
+                    "ROLE_COMMENT_MANAGER",
+                    user.getUsername(),
+                    user.getFullName(),
+                    "New Comment Posted",
+                    user.getFullName() + " commented on \"" + video.getTitle() + "\": \"" + excerpt + "\"",
+                    "COMMENT",
+                    video.getId()
+            );
+
+            // 2. Notify Video Creator
+            if (video.getCreator() != null && !video.getCreator().getUsername().equals(user.getUsername())) {
+                notificationService.sendNotification(
+                        video.getCreator().getUsername(),
+                        null,
+                        user.getUsername(),
+                        user.getFullName(),
+                        "New Comment on Your Video",
+                        user.getFullName() + " commented on \"" + video.getTitle() + "\": \"" + excerpt + "\"",
+                        "COMMENT",
+                        video.getId()
+                );
+            }
+        } catch (Exception ignored) {
+        }
+
+        return toResponse(saved);
     }
 
     @Override
@@ -61,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
         User user = findUser(username);
 
         boolean isOwner = comment.getUser().getId().equals(user.getId());
-        boolean isManager = user.getRole() == Role.COMMENT_MANAGER;
+        boolean isManager = user.getRole() == Role.ROLE_COMMENT_MANAGER;
 
         if (!isOwner && !isManager) {
             throw new BadRequestException("You do not have permission to edit this comment");
@@ -78,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
         User user = findUser(username);
 
         boolean isOwner = comment.getUser().getId().equals(user.getId());
-        boolean isManager = user.getRole() == Role.COMMENT_MANAGER;
+        boolean isManager = user.getRole() == Role.ROLE_COMMENT_MANAGER;
 
         if (!isOwner && !isManager) {
             throw new BadRequestException("You do not have permission to delete this comment");
@@ -150,6 +189,13 @@ public class CommentServiceImpl implements CommentService {
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getAllComments() {
+        return commentRepository.findAllByOrderByCreatedAtDesc()
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
     // ---- Helpers ----
 
     private Comment findComment(Long id) {
@@ -175,6 +221,7 @@ public class CommentServiceImpl implements CommentService {
         if (c.getUser() != null) {
             r.setUserId(c.getUser().getId());
             r.setUserName(c.getUser().getUsername());
+            r.setUserRole(c.getUser().getRole() != null ? c.getUser().getRole().name() : null);
         }
         if (c.getVideo() != null) {
             r.setVideoId(c.getVideo().getId());

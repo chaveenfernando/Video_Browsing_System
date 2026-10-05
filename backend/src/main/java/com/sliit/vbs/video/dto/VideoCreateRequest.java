@@ -2,11 +2,12 @@ package com.sliit.vbs.video.dto;
 
 import com.sliit.vbs.video.entity.VideoStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class VideoCreateRequest {
 
-    @NotBlank(message = "Video title is required")
+    @NotBlank(message = "Title is required")
     @Size(max = 150, message = "Title cannot exceed 150 characters")
     private String title;
 
@@ -19,6 +20,7 @@ public class VideoCreateRequest {
 
     private Integer durationSeconds;
 
+    @NotNull(message = "Please select a category")
     private Long categoryId;
 
     private String tags;

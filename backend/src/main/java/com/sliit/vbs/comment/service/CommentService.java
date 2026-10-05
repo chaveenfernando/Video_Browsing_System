@@ -35,4 +35,5 @@ public interface CommentService {
     List<CommentResponse> getPinnedCommentsByVideo(Long videoId);
 
     List<CommentResponse> getCommentsByUser(String username);
+    List<CommentResponse> getAllComments();
 }

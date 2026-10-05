@@ -7,6 +7,7 @@ export interface Playlist {
   isPublic: boolean;
   userId: number;
   creatorName: string;
+  creatorRole?: string;
   videoCount: number;
   createdAt: string;
 }
@@ -28,6 +29,9 @@ const playlistApi = {
 
   getMyPlaylists: () =>
     client.get<{ data: Playlist[] }>('/playlists'),
+
+  getAllPlaylists: () =>
+    client.get<{ data: Playlist[] }>('/playlists/all'),
 
   getPublicPlaylists: () =>
     client.get<{ data: Playlist[] }>('/playlists/public'),

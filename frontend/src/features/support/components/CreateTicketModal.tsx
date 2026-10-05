@@ -79,9 +79,12 @@ const CreateTicketModal: React.FC<Props> = ({ onClose, onSuccess }) => {
               <select
                 value={form.priority}
                 onChange={e => setForm(f => ({ ...f, priority: e.target.value as CreateTicketRequest['priority'] }))}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 text-sm"
+                className="w-full border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 text-sm cursor-pointer"
+                style={{ backgroundColor: '#1e1b2e', colorScheme: 'dark' }}
               >
-                {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
+                {PRIORITIES.map(p => (
+                  <option key={p} value={p} style={{ backgroundColor: '#1e1b2e', color: '#fff' }}>{p}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -89,9 +92,12 @@ const CreateTicketModal: React.FC<Props> = ({ onClose, onSuccess }) => {
               <select
                 value={form.category}
                 onChange={e => setForm(f => ({ ...f, category: e.target.value as CreateTicketRequest['category'] }))}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 text-sm"
+                className="w-full border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 text-sm cursor-pointer"
+                style={{ backgroundColor: '#1e1b2e', colorScheme: 'dark' }}
               >
-                {CATEGORIES.map(c => <option key={c} value={c}>{c.replace('_', ' ')}</option>)}
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c} style={{ backgroundColor: '#1e1b2e', color: '#fff' }}>{c.replace('_', ' ')}</option>
+                ))}
               </select>
             </div>
           </div>
