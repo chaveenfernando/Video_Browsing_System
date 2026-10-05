@@ -39,7 +39,7 @@ public class CommentController {
             @AuthenticationPrincipal UserDetails userDetails) {
         CommentResponse response = commentService.addComment(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Comment posted successfully", response));
+                .body(ApiResponse.success(response, "Comment posted successfully"));
     }
 
     @GetMapping("/video/{videoId}")
@@ -67,13 +67,19 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.success(commentService.getCommentsByUser(userDetails.getUsername())));
     }
 
+    @GetMapping("/all")
+    @Operation(summary = "Get all platform comments (for Comment Manager)")
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> getAllComments() {
+        return ResponseEntity.ok(ApiResponse.success(commentService.getAllComments()));
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Edit a comment (owner or Comment Manager)")
     public ResponseEntity<ApiResponse<CommentResponse>> editComment(
             @PathVariable Long id,
             @RequestParam String content,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Comment updated", commentService.editComment(id, content, userDetails.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success(commentService.editComment(id, content, userDetails.getUsername()), "Comment updated"));
     }
 
     @DeleteMapping("/{id}")
@@ -82,36 +88,36 @@ public class CommentController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         commentService.deleteComment(id, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Comment deleted", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Comment deleted"));
     }
 
     @PatchMapping("/{id}/pin")
     @Operation(summary = "Pin a comment (Comment Manager only)")
     public ResponseEntity<ApiResponse<CommentResponse>> pinComment(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Comment pinned", commentService.pinComment(id)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.pinComment(id), "Comment pinned"));
     }
 
     @PatchMapping("/{id}/unpin")
     @Operation(summary = "Unpin a comment (Comment Manager only)")
     public ResponseEntity<ApiResponse<CommentResponse>> unpinComment(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Comment unpinned", commentService.unpinComment(id)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.unpinComment(id), "Comment unpinned"));
     }
 
     @PatchMapping("/{id}/hide")
     @Operation(summary = "Hide a comment (Comment Manager only)")
     public ResponseEntity<ApiResponse<CommentResponse>> hideComment(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Comment hidden", commentService.hideComment(id)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.hideComment(id), "Comment hidden"));
     }
 
     @PatchMapping("/{id}/unhide")
     @Operation(summary = "Unhide a comment (Comment Manager only)")
     public ResponseEntity<ApiResponse<CommentResponse>> unhideComment(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Comment unhidden", commentService.unhideComment(id)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.unhideComment(id), "Comment unhidden"));
     }
 
     @PatchMapping("/{id}/like")
     @Operation(summary = "Like a comment")
     public ResponseEntity<ApiResponse<CommentResponse>> likeComment(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Comment liked", commentService.likeComment(id)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.likeComment(id), "Comment liked"));
     }
 }

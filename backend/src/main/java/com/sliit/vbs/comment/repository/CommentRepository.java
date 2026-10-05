@@ -21,6 +21,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c WHERE c.video.id = :videoId AND c.isHidden = false ORDER BY c.isPinned DESC, c.createdAt DESC")
     List<Comment> findVisibleByVideoId(@Param("videoId") Long videoId);
 
+    // All comments across the platform (platform-wide comment manager view)
+    List<Comment> findAllByOrderByCreatedAtDesc();
+
     // All comments for a video (admin/manager view)
     List<Comment> findByVideoIdOrderByIsPinnedDescCreatedAtDesc(Long videoId);
 
