@@ -1,22 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-<<<<<<< Updated upstream
-import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles } from 'lucide-react';
-=======
 import { LayoutDashboard, Video as VideoIcon, BarChart3, Compass, Sparkles, Headset, MessageSquare, Tag, Heart, ListVideo, BookMarked } from 'lucide-react';
->>>>>>> Stashed changes
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
-<<<<<<< Updated upstream
-  const links = [
-    { to: '/studio', label: 'Dashboard', icon: LayoutDashboard, end: true },
-    { to: '/studio/content', label: 'Content Library', icon: VideoIcon, end: false },
-    { to: '/studio/analytics', label: 'Analytics', icon: BarChart3, end: false },
-  ];
-=======
   const role = user?.role ?? '';
 
   const navLinks = role.includes('TECHNICAL_SUPPORTER')
@@ -46,7 +35,6 @@ export const Sidebar: React.FC = () => {
     : role.includes('PLAYLIST_MANAGER') ? 'Playlist Menu'
     : role.includes('GENERAL_VIEWER') ? 'Viewer Menu'
     : 'Studio Menu';
->>>>>>> Stashed changes
 
   return (
     <aside className="w-64 border-r border-slate-800/80 bg-slate-950/40 p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-4rem)]">
@@ -66,8 +54,8 @@ export const Sidebar: React.FC = () => {
 
         {/* Navigation Items */}
         <div className="space-y-1">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Studio Menu</p>
-          {links.map((link) => {
+          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{menuLabel}</p>
+          {navLinks.map((link) => {
             const Icon = link.icon;
             return (
               <NavLink
@@ -100,24 +88,7 @@ export const Sidebar: React.FC = () => {
           </NavLink>
         </div>
       </div>
-<<<<<<< Updated upstream
 
-      {/* Project Meta Info */}
-      <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-        <div className="flex items-center justify-between text-slate-300 font-medium">
-          <span>Module:</span>
-          <span>SE2030</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Group:</span>
-          <span className="text-indigo-400 font-mono text-[10px]">B5G2-03</span>
-        </div>
-        <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-800">
-          Role: Content Creator
-        </div>
-      </div>
-=======
->>>>>>> Stashed changes
     </aside>
   );
 };

@@ -14,18 +14,7 @@ import java.util.List;
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
-    private final CategoryRepository categoryRepository;
-
-<<<<<<< Updated upstream
-    public CategoryController(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
-
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return ResponseEntity.ok(ApiResponse.success(categories, "Categories retrieved"));
-=======
+    private final CategoryService categoryService;
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
@@ -94,6 +83,5 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok(ApiResponse.success(null, "Category deleted"));
->>>>>>> Stashed changes
     }
 }
