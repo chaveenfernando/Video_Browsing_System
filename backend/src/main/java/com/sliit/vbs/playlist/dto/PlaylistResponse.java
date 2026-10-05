@@ -9,6 +9,7 @@ public class PlaylistResponse {
     private Boolean isPublic;
     private Long userId;
     private String creatorName;
+    private String creatorRole;
     private int videoCount;
     private LocalDateTime createdAt;
 
@@ -24,6 +25,8 @@ public class PlaylistResponse {
     public void setUserId(Long userId) { this.userId = userId; }
     public String getCreatorName() { return creatorName; }
     public void setCreatorName(String creatorName) { this.creatorName = creatorName; }
+    public String getCreatorRole() { return creatorRole; }
+    public void setCreatorRole(String creatorRole) { this.creatorRole = creatorRole; }
     public int getVideoCount() { return videoCount; }
     public void setVideoCount(int videoCount) { this.videoCount = videoCount; }
     public LocalDateTime getCreatedAt() { return createdAt; }
