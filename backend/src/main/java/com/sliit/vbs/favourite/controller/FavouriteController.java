@@ -1,6 +1,7 @@
 package com.sliit.vbs.favourite.controller;
 
 import com.sliit.vbs.common.dto.ApiResponse;
+import com.sliit.vbs.favourite.dto.FavouriteAnalyticsResponse;
 import com.sliit.vbs.favourite.dto.FavouriteRequest;
 import com.sliit.vbs.favourite.dto.FavouriteResponse;
 import com.sliit.vbs.favourite.service.FavouriteService;
@@ -32,13 +33,13 @@ public class FavouriteController {
     }
 
     @PostMapping
-    @Operation(summary = "Add a video to favourites")
+    @Operation(summary = "Add a video to favourites (notifies Favourite Manager and Creator)")
     public ResponseEntity<ApiResponse<FavouriteResponse>> addFavourite(
             @Valid @RequestBody FavouriteRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         FavouriteResponse response = favouriteService.addFavourite(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Video added to favourites", response));
+                .body(ApiResponse.success(response, "Video added to favourites"));
     }
 
     @DeleteMapping("/video/{videoId}")
@@ -47,14 +48,26 @@ public class FavouriteController {
             @PathVariable Long videoId,
             @AuthenticationPrincipal UserDetails userDetails) {
         favouriteService.removeFavourite(videoId, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Video removed from favourites", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Video removed from favourites"));
     }
 
     @GetMapping
-    @Operation(summary = "Get user's favourite videos")
+    @Operation(summary = "Get current user's favourite videos")
     public ResponseEntity<ApiResponse<List<FavouriteResponse>>> getFavourites(
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.success(favouriteService.getFavouritesByUser(userDetails.getUsername())));
+    }
+
+    @GetMapping("/management")
+    @Operation(summary = "Get all platform favourites (Favourite Manager role)")
+    public ResponseEntity<ApiResponse<List<FavouriteResponse>>> getAllFavourites() {
+        return ResponseEntity.ok(ApiResponse.success(favouriteService.getAllFavourites()));
+    }
+
+    @GetMapping("/analytics")
+    @Operation(summary = "Get favourite analytics, viewer breakdown and rankings (Favourite Manager role)")
+    public ResponseEntity<ApiResponse<FavouriteAnalyticsResponse>> getFavouriteAnalytics() {
+        return ResponseEntity.ok(ApiResponse.success(favouriteService.getFavouriteAnalytics()));
     }
 
     @GetMapping("/video/{videoId}/check")

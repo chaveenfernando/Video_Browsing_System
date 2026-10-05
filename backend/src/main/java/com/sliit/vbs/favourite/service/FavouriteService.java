@@ -1,5 +1,6 @@
 package com.sliit.vbs.favourite.service;
 
+import com.sliit.vbs.favourite.dto.FavouriteAnalyticsResponse;
 import com.sliit.vbs.favourite.dto.FavouriteRequest;
 import com.sliit.vbs.favourite.dto.FavouriteResponse;
 
@@ -17,6 +18,10 @@ public interface FavouriteService {
     void removeFavourite(Long videoId, String username);
 
     List<FavouriteResponse> getFavouritesByUser(String username);
+
+    List<FavouriteResponse> getAllFavourites();
+
+    FavouriteAnalyticsResponse getFavouriteAnalytics();
 
     boolean isFavourite(Long videoId, String username);
 }
