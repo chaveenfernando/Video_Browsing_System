@@ -42,7 +42,7 @@ public class SupportTicketController {
             @AuthenticationPrincipal UserDetails userDetails) {
         SupportTicketResponse ticket = supportTicketService.createTicket(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Ticket created successfully", ticket));
+                .body(ApiResponse.success(ticket, "Ticket created successfully"));
     }
 
     @GetMapping("/tickets/{id}")
@@ -76,7 +76,7 @@ public class SupportTicketController {
     public ResponseEntity<ApiResponse<SupportTicketResponse>> updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody TicketStatusUpdateRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Ticket status updated", supportTicketService.updateTicketStatus(id, request)));
+        return ResponseEntity.ok(ApiResponse.success(supportTicketService.updateTicketStatus(id, request), "Ticket status updated"));
     }
 
     @PutMapping("/tickets/{id}")
@@ -85,7 +85,7 @@ public class SupportTicketController {
             @PathVariable Long id,
             @Valid @RequestBody SupportTicketRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Ticket updated", supportTicketService.updateTicket(id, request, userDetails.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success(supportTicketService.updateTicket(id, request, userDetails.getUsername()), "Ticket updated"));
     }
 
     @DeleteMapping("/tickets/{id}")
@@ -94,7 +94,7 @@ public class SupportTicketController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         supportTicketService.deleteTicket(id, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Ticket deleted successfully", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Ticket deleted successfully"));
     }
 
     @GetMapping("/dashboard/stats")

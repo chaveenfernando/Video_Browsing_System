@@ -1,32 +1,31 @@
 package com.sliit.vbs.category.controller;
 
-import com.sliit.vbs.category.dto.CategoryRequest;
-import com.sliit.vbs.category.dto.CategoryResponse;
-import com.sliit.vbs.category.dto.MergeCategoryRequest;
-import com.sliit.vbs.category.service.CategoryService;
+import com.sliit.vbs.category.entity.Category;
+import com.sliit.vbs.category.repository.CategoryRepository;
 import com.sliit.vbs.common.dto.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * REST controller for managing video categories.
- * Provides endpoints to create, rename, merge and delete categories.
- *
- * @author IT25102597
- */
 @RestController
 @RequestMapping("/api/v1/categories")
-@Tag(name = "Categories", description = "Category Manager - Video Category Management APIs")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
+<<<<<<< Updated upstream
+    public CategoryController(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return ResponseEntity.ok(ApiResponse.success(categories, "Categories retrieved"));
+=======
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
@@ -36,7 +35,7 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Category created", categoryService.createCategory(request)));
+                .body(ApiResponse.success(categoryService.createCategory(request), "Category created"));
     }
 
     @GetMapping
@@ -67,34 +66,34 @@ public class CategoryController {
     @Operation(summary = "Update a category")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Category updated", categoryService.updateCategory(id, request)));
+        return ResponseEntity.ok(ApiResponse.success(categoryService.updateCategory(id, request), "Category updated"));
     }
 
     @PatchMapping("/{id}/rename")
     @Operation(summary = "Rename a category")
     public ResponseEntity<ApiResponse<CategoryResponse>> renameCategory(
             @PathVariable Long id, @RequestParam String name) {
-        return ResponseEntity.ok(ApiResponse.success("Category renamed", categoryService.renameCategory(id, name)));
+        return ResponseEntity.ok(ApiResponse.success(categoryService.renameCategory(id, name), "Category renamed"));
     }
 
     @PostMapping("/merge")
     @Operation(summary = "Merge one category into another (all videos will be reassigned)")
     public ResponseEntity<ApiResponse<CategoryResponse>> mergeCategories(
             @Valid @RequestBody MergeCategoryRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Categories merged successfully", categoryService.mergeCategories(request)));
+        return ResponseEntity.ok(ApiResponse.success(categoryService.mergeCategories(request), "Categories merged successfully"));
     }
 
     @PatchMapping("/{id}/toggle-active")
     @Operation(summary = "Toggle a category active/inactive")
     public ResponseEntity<ApiResponse<CategoryResponse>> toggleActive(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Category status toggled", categoryService.toggleActive(id)));
+        return ResponseEntity.ok(ApiResponse.success(categoryService.toggleActive(id), "Category status toggled"));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a category (only if it has no videos)")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok(ApiResponse.success("Category deleted", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Category deleted"));
+>>>>>>> Stashed changes
     }
 }
-

@@ -51,6 +51,7 @@ export const RoleBadge: React.FC<{ role: Role }> = ({ role }) => {
     ROLE_FAVOURITE_MANAGER: { text: 'Favourite Curator', variant: 'warning' },
     ROLE_COMMENT_MANAGER: { text: 'Comment Moderator', variant: 'default' },
     ROLE_TECHNICAL_SUPPORTER: { text: 'Tech Supporter', variant: 'danger' },
+    ROLE_GENERAL_VIEWER: { text: 'Viewer', variant: 'default' },
   };
 
   const item = map[role] || { text: role, variant: 'default' };

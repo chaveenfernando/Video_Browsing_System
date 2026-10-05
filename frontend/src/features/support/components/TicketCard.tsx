@@ -31,6 +31,8 @@ const PRIORITY_DOTS: Record<SupportTicket['priority'], string> = {
 };
 
 const TicketCard: React.FC<Props> = ({ ticket, onClick, onStatusChange, onDelete }) => {
+  const isVideoIssue = ticket.subject.startsWith('Video Issue:') || ticket.description.includes('Video ID:');
+
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
@@ -43,15 +45,24 @@ const TicketCard: React.FC<Props> = ({ ticket, onClick, onStatusChange, onDelete
 
   return (
     <div
-      className="group bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/8 hover:border-white/20 transition-all duration-200 cursor-pointer"
+      className={`group border rounded-xl p-4 transition-all duration-200 cursor-pointer ${
+        isVideoIssue
+          ? 'bg-amber-950/15 border-amber-500/25 hover:bg-amber-950/25 hover:border-amber-500/40'
+          : 'bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20'
+      }`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${PRIORITY_DOTS[ticket.priority]}`} />
             <span className="text-xs text-gray-400 font-mono">#{ticket.id}</span>
             <span className="text-xs text-gray-500">{ticket.category.replace('_', ' ')}</span>
+            {isVideoIssue && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                🎬 Video
+              </span>
+            )}
           </div>
           <h3 className="text-sm font-semibold text-white truncate group-hover:text-purple-300 transition-colors">
             {ticket.subject}

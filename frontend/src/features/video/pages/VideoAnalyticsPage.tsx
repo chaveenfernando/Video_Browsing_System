@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, ThumbsUp, TrendingUp, BarChart2, Award, Info } from 'lucide-react';
+import { Eye, ThumbsUp, TrendingUp, Award, Info } from 'lucide-react';
 import { videoApi } from '../../../api/videoApi';
 import { CreatorDashboardSummary } from '../../../types';
 import { Card } from '../../../components/ui/Card';

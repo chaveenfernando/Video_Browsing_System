@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, Sparkles, Compass, Film } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, Film } from 'lucide-react';
 import { videoApi } from '../../../api/videoApi';
 import { Category, Video } from '../../../types';
 import { VideoCard } from '../components/VideoCard';
@@ -37,6 +37,14 @@ export const BrowseVideosPage: React.FC = () => {
     fetchVideos();
   }, [selectedCategory, sortStrategy]);
 
+  // Refresh the video list when a new video is uploaded via the modal
+  useEffect(() => {
+    const handleVideoUploaded = () => fetchVideos();
+    window.addEventListener('video-uploaded', handleVideoUploaded);
+    return () => window.removeEventListener('video-uploaded', handleVideoUploaded);
+  }, [selectedCategory, sortStrategy]);
+
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchVideos();
@@ -47,15 +55,12 @@ export const BrowseVideosPage: React.FC = () => {
       {/* Hero Welcome Banner */}
       <div className="relative rounded-2xl p-6 sm:p-8 overflow-hidden bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 border border-indigo-500/20 shadow-2xl">
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Group 2026-Y2-S1-MLB-B5G2-03</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-            Discover Tech Lectures, Code Demos & System Tutorials
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight flex items-center gap-3">
+            <Sparkles className="w-8 h-8 text-indigo-400" />
+            EduStream
           </h1>
           <p className="text-sm text-slate-300 leading-relaxed">
-            A high-performance video streaming platform built with Spring Boot 3, Java 21, and React 18 for the SE2030 university project.
+            Explore and discover a wide variety of educational videos, tech lectures, and system tutorials.
           </p>
         </div>
 

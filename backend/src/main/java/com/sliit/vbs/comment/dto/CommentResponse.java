@@ -17,6 +17,7 @@ public class CommentResponse {
     private Integer likeCount;
     private Long userId;
     private String userName;
+    private String userRole;
     private Long videoId;
     private String videoTitle;
     private LocalDateTime createdAt;
@@ -38,6 +39,8 @@ public class CommentResponse {
     public void setUserId(Long userId) { this.userId = userId; }
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+    public String getUserRole() { return userRole; }
+    public void setUserRole(String userRole) { this.userRole = userRole; }
     public Long getVideoId() { return videoId; }
     public void setVideoId(Long videoId) { this.videoId = videoId; }
     public String getVideoTitle() { return videoTitle; }

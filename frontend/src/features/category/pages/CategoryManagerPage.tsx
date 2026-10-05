@@ -126,10 +126,10 @@ const CategoryManagerPage: React.FC = () => {
               <div className="flex items-center justify-between text-xs text-gray-500">
                 <span>{cat.videoCount} video{cat.videoCount !== 1 ? 's' : ''}</span>
                 {!mergeMode && (
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(cat)} className="hover:text-violet-400 transition-colors">Edit</button>
-                    <button onClick={() => handleToggle(cat)} className="hover:text-yellow-400 transition-colors">{cat.isActive ? 'Deactivate' : 'Activate'}</button>
-                    <button onClick={() => handleDelete(cat)} className="hover:text-red-400 transition-colors">Delete</button>
+                  <div className="flex gap-3 transition-opacity">
+                    <button onClick={() => openEdit(cat)} className="text-violet-400 hover:text-violet-300 font-medium transition-colors">Edit</button>
+                    <button onClick={() => handleToggle(cat)} className="text-yellow-400 hover:text-yellow-300 font-medium transition-colors">{cat.isActive ? 'Deactivate' : 'Activate'}</button>
+                    <button onClick={() => handleDelete(cat)} className="text-red-400 hover:text-red-300 font-medium transition-colors">Delete</button>
                   </div>
                 )}
               </div>

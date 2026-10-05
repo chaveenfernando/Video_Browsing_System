@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Upload, ExternalLink, Edit3, Trash2, Film, Filter } from 'lucide-react';
+import { Search, Upload, ExternalLink, Edit3, Trash2, Film } from 'lucide-react';
 import { videoApi } from '../../../api/videoApi';
 import { Video, VideoStatus } from '../../../types';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { Input } from '../../../components/ui/Input';
 import { VideoStatusBadge } from '../../../components/ui/Badge';
 import { VideoUploadModal } from '../components/VideoUploadModal';
 import { VideoEditModal } from '../components/VideoEditModal';
@@ -32,15 +31,20 @@ export const VideoLibraryPage: React.FC = () => {
 
   useEffect(() => {
     fetchVideos();
+
+    const handleUploadEvent = () => fetchVideos();
+    window.addEventListener('video-uploaded', handleUploadEvent);
+    return () => window.removeEventListener('video-uploaded', handleUploadEvent);
   }, []);
 
   const handleDelete = async (id: number, title: string) => {
     if (window.confirm(`Are you sure you want to permanently delete "${title}"?`)) {
       try {
         await videoApi.deleteVideo(id);
+        window.dispatchEvent(new CustomEvent('video-uploaded'));
         fetchVideos();
-      } catch (err) {
-        alert('Failed to delete video.');
+      } catch (err: any) {
+        alert(err.response?.data?.message || err.message || 'Failed to delete video.');
       }
     }
   };

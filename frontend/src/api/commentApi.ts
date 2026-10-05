@@ -9,6 +9,7 @@ export interface Comment {
   likeCount: number;
   userId: number;
   userName: string;
+  userRole?: string;
   videoId: number;
   videoTitle: string;
   createdAt: string;
@@ -23,6 +24,9 @@ export interface CommentRequest {
 const commentApi = {
   addComment: (data: CommentRequest) =>
     client.post<{ data: Comment }>('/comments', data),
+
+  getAllComments: () =>
+    client.get<{ data: Comment[] }>('/comments/all'),
 
   getCommentsByVideo: (videoId: number) =>
     client.get<{ data: Comment[] }>(`/comments/video/${videoId}`),

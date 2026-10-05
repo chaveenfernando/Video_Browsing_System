@@ -14,6 +14,13 @@ public class FavouriteResponse {
     private String videoTitle;
     private String thumbnailUrl;
     private String creatorName;
+    private Long userId;
+    private String userName;
+    private String userEmail;
+    private String userRole;
+    private Long likesCount;
+    private Long viewsCount;
+    private String categoryName;
     private LocalDateTime createdAt;
 
     public Long getId() {
@@ -54,6 +61,62 @@ public class FavouriteResponse {
 
     public void setCreatorName(String creatorName) {
         this.creatorName = creatorName;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public Long getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(Long likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public Long getViewsCount() {
+        return viewsCount;
+    }
+
+    public void setViewsCount(Long viewsCount) {
+        this.viewsCount = viewsCount;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public LocalDateTime getCreatedAt() {

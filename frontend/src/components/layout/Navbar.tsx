@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PlaySquare, Upload, LogOut, User as UserIcon, Compass, LayoutDashboard } from 'lucide-react';
+import { PlaySquare, Upload, LogOut, Compass, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../ui/Button';
 import { RoleBadge } from '../ui/Badge';
+import { NotificationBell } from './NotificationBell';
 
 interface NavbarProps {
   onOpenUpload?: () => void;
@@ -29,9 +30,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload }) => {
             </div>
             <div>
               <span className="text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                VBS <span className="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">SE2030</span>
+                EduStream
               </span>
-              <p className="text-[10px] text-slate-400 font-medium tracking-wide">Video Browsing System</p>
+              <p className="text-[10px] text-slate-400 font-medium tracking-wide">Educational Video Platform</p>
             </div>
           </Link>
         </div>
@@ -46,13 +47,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload }) => {
             Browse Videos
           </Link>
 
-          {isContentCreator && (
+          {isAuthenticated && (
             <Link
-              to="/studio"
+              to={
+                user?.role === 'ROLE_TECHNICAL_SUPPORTER' ? '/support' :
+                user?.role === 'ROLE_COMMENT_MANAGER' ? '/comments/manage' :
+                user?.role === 'ROLE_CATEGORY_MANAGER' ? '/categories/manage' :
+                user?.role === 'ROLE_FAVOURITE_MANAGER' ? '/favourites/manage' :
+                user?.role === 'ROLE_PLAYLIST_MANAGER' ? '/playlists/manage' :
+                user?.role === 'ROLE_GENERAL_VIEWER' ? '/library' :
+                '/studio'
+              }
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 transition-colors"
             >
               <LayoutDashboard className="w-4 h-4" />
-              Creator Studio
+              {user?.role === 'ROLE_CONTENT_CREATOR' ? 'Creator Studio' :
+               user?.role === 'ROLE_GENERAL_VIEWER' ? 'My Library' : 'My Dashboard'}
             </Link>
           )}
         </nav>
@@ -61,6 +71,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload }) => {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
+              {/* Stakeholder In-App Notification Center */}
+              <NotificationBell />
+
               {isContentCreator && onOpenUpload && (
                 <Button size="sm" onClick={onOpenUpload} className="hidden sm:inline-flex gap-2">
                   <Upload className="w-4 h-4" />

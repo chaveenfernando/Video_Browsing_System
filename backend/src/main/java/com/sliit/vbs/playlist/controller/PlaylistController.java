@@ -33,7 +33,7 @@ public class PlaylistController {
             @Valid @RequestBody PlaylistRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Playlist created", playlistService.createPlaylist(request, userDetails.getUsername())));
+                .body(ApiResponse.success(playlistService.createPlaylist(request, userDetails.getUsername()), "Playlist created"));
     }
 
     @GetMapping
@@ -49,6 +49,12 @@ public class PlaylistController {
         return ResponseEntity.ok(ApiResponse.success(playlistService.getPublicPlaylists()));
     }
 
+    @GetMapping("/all")
+    @Operation(summary = "Get all platform playlists (for Playlist Manager oversight)")
+    public ResponseEntity<ApiResponse<List<PlaylistResponse>>> getAllPlaylists() {
+        return ResponseEntity.ok(ApiResponse.success(playlistService.getAllPlaylists()));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get a playlist by ID")
     public ResponseEntity<ApiResponse<PlaylistResponse>> getPlaylist(@PathVariable Long id) {
@@ -61,7 +67,7 @@ public class PlaylistController {
             @PathVariable Long id,
             @Valid @RequestBody PlaylistRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Playlist updated", playlistService.updatePlaylist(id, request, userDetails.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success(playlistService.updatePlaylist(id, request, userDetails.getUsername()), "Playlist updated"));
     }
 
     @DeleteMapping("/{id}")
@@ -70,7 +76,7 @@ public class PlaylistController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         playlistService.deletePlaylist(id, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Playlist deleted", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Playlist deleted"));
     }
 
     @PostMapping("/{playlistId}/videos/{videoId}")
@@ -80,7 +86,7 @@ public class PlaylistController {
             @PathVariable Long videoId,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Video added to playlist", playlistService.addVideoToPlaylist(playlistId, videoId, userDetails.getUsername())));
+                .body(ApiResponse.success(playlistService.addVideoToPlaylist(playlistId, videoId, userDetails.getUsername()), "Video added to playlist"));
     }
 
     @DeleteMapping("/{playlistId}/videos/{videoId}")
@@ -90,7 +96,7 @@ public class PlaylistController {
             @PathVariable Long videoId,
             @AuthenticationPrincipal UserDetails userDetails) {
         playlistService.removeVideoFromPlaylist(playlistId, videoId, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Video removed from playlist", null));
+        return ResponseEntity.ok(ApiResponse.success(null, "Video removed from playlist"));
     }
 
     @GetMapping("/{playlistId}/videos")

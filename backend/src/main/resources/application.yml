@@ -7,7 +7,7 @@ spring:
   application:
     name: vbs-backend
   profiles:
-    active: dev
+    active: local
   servlet:
     multipart:
       max-file-size: 100MB
